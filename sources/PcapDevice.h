@@ -18,7 +18,7 @@ namespace gtss {
 class PcapDevice {
 public:
 	PcapDevice();
-	virtual ~PcapDevice();
+	~PcapDevice();
 
 	bool open(const std::string& device, const std::string& filter);
 	bool isOpen() const;
