@@ -8,18 +8,40 @@
 
 #include <iostream>
 
+#include "PacketSniffer.h"
 #include "PcapDevice.h"
 #include "Log.h"
 
+#include <pcap.h>
+
+using namespace gtss;
+
+namespace {
+
+class PacketSizeTracer : public PacketSniffer {
+public:
+	PacketSizeTracer(PcapDevice& dev) : PacketSniffer(dev) {}
+
+protected:
+	virtual void onPacket(const pcap_pkthdr *h, const u_char *bytes)
+	{
+		GTSS_LOG("Packet sniffed. Size: " << h->len);
+	}
+};
+
+}
+
 int main()
 {
-	using namespace gtss;
-
 	PcapDevice device;
 
 	if (device.open("any", "host 127.0.0.1"))
 	{
 		GTSS_LOG("Device opened with filter specified.");
+
+		PacketSizeTracer tracer(device);
+		tracer.startSniffing();
+
 		return 0;
 	}
 	else
