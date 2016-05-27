@@ -9,6 +9,8 @@
 #include "BindToScope.h"
 #include "Log.h"
 
+#include <algorithm>
+
 #include <pcap.h>
 
 namespace gtss {
@@ -32,8 +34,24 @@ bool PcapDeviceList::enumerate(std::vector<std::string>& output)
     for(auto device = devices; device != nullptr; device = device->next)
     	output.push_back(device->name);
 
+    if (output.empty())
+    	GTSS_LOG("Enumerate succeed but no interfaces found. Are you root?");
+
     return true;
 
+}
+
+bool PcapDeviceList::isDeviceValid(const std::string& device)
+{
+	if (device.empty())
+		return false;
+
+	std::vector<std::string> devices;
+
+	if (enumerate(devices) && std::find(devices.cbegin(), devices.cend(), device) != devices.cend())
+		return true;
+	else
+		return false;
 }
 
 } /* namespace gtss */

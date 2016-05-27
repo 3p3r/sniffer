@@ -13,19 +13,14 @@
 
 int main()
 {
-	std::vector<std::string> devices;
-
-	if (gtss::PcapDeviceList::enumerate(devices))
+	if (gtss::PcapDeviceList::isDeviceValid("any"))
 	{
-		for(const auto& device : devices)
-			GTSS_LOG("Device found: " << device);
-
-		GTSS_LOG("Device enumeration succeed.");
+		GTSS_LOG("'any' device is valid.");
 		return 0;
 	}
 	else
 	{
-		GTSS_LOG("Device enumeration failed.");
+		GTSS_LOG("'any' device is not valid.");
 		return 1;
 	}
 }

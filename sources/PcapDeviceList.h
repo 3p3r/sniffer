@@ -16,6 +16,7 @@ namespace gtss {
 class PcapDeviceList {
 public:
 	static bool enumerate(std::vector<std::string>& devices);
+	static bool isDeviceValid(const std::string& device);
 };
 
 } /* namespace gtss */
