@@ -8,19 +8,23 @@
 
 #include <iostream>
 
-#include "PcapDeviceList.h"
+#include "PcapDevice.h"
 #include "Log.h"
 
 int main()
 {
-	if (gtss::PcapDeviceList::isDeviceValid("any"))
+	using namespace gtss;
+
+	PcapDevice device;
+
+	if (device.open("any", "host 127.0.0.1"))
 	{
-		GTSS_LOG("'any' device is valid.");
+		GTSS_LOG("Device opened with filter specified.");
 		return 0;
 	}
 	else
 	{
-		GTSS_LOG("'any' device is not valid.");
+		GTSS_LOG("Device failed to open with filter specified.");
 		return 1;
 	}
 }
