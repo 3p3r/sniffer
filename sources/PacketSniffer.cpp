@@ -10,6 +10,8 @@
 
 #include <pcap.h>
 
+#include "Log.h"
+
 namespace gtss {
 
 PacketSniffer::PacketSniffer(PcapDevice& device)
@@ -19,7 +21,7 @@ PacketSniffer::PacketSniffer(PcapDevice& device)
 void PacketSniffer::startSniffing()
 {
 	if (mDevice.isOpen())
-		::pcap_loop(mDevice.getDevice(), 0, reinterpret_cast<pcap_handler>(onPcapLoopCallback), reinterpret_cast<u_char *>(this));
+		::pcap_loop(mDevice.getDevice(), -1, reinterpret_cast<::pcap_handler>(onPcapLoopCallback), reinterpret_cast<u_char *>(this));
 }
 
 void PacketSniffer::onPcapLoopCallback(PacketSniffer* user,

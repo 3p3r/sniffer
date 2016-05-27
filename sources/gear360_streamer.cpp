@@ -18,12 +18,12 @@ using namespace gtss;
 
 namespace {
 
-class PacketSizeTracer : public PacketSniffer {
+class PacketSizeTracer final : public PacketSniffer {
 public:
 	PacketSizeTracer(PcapDevice& dev) : PacketSniffer(dev) {}
 
 protected:
-	virtual void onPacket(const pcap_pkthdr *h, const u_char *bytes)
+	void onPacket(const pcap_pkthdr *h, const u_char *bytes) override
 	{
 		GTSS_LOG("Packet sniffed. Size: " << h->len);
 	}
@@ -35,7 +35,7 @@ int main()
 {
 	PcapDevice device;
 
-	if (device.open("any", "host 127.0.0.1"))
+	if (device.open("any", "tcp"))
 	{
 		GTSS_LOG("Device opened with filter specified.");
 
