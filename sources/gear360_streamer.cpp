@@ -10,6 +10,7 @@
 
 #include "PacketSniffer.h"
 #include "PcapDevice.h"
+#include "UdpClient.h"
 #include "Log.h"
 
 #include <pcap.h>
@@ -18,15 +19,21 @@ using namespace gtss;
 
 namespace {
 
-class PacketSizeTracer final : public PacketSniffer {
+class PacketBroadcaster final : public PacketSniffer {
 public:
-	PacketSizeTracer(PcapDevice& dev) : PacketSniffer(dev) {}
+	PacketBroadcaster(PcapDevice& dev, UdpClient& client)
+		: PacketSniffer(dev)
+		, mUdpClient(client)
+	{}
 
 protected:
 	void onPacket(const pcap_pkthdr *h, const u_char *bytes) override
 	{
-		GTSS_LOG("Packet sniffed. Size: " << h->len);
+		mUdpClient.send(bytes, h->caplen);
 	}
+
+private:
+	UdpClient& mUdpClient;
 };
 
 }
@@ -34,12 +41,20 @@ protected:
 int main()
 {
 	PcapDevice device;
+	UdpClient client;
+
+	if (!client.setEndpoint("192.168.1.168", 5000))
+	{
+		GTSS_LOG("Unable to set UDP endpoint.");
+		return 0;
+	}
+
 
 	if (device.open("any", "tcp"))
 	{
 		GTSS_LOG("Device opened with filter specified.");
 
-		PacketSizeTracer tracer(device);
+		PacketBroadcaster tracer(device, client);
 		tracer.startSniffing();
 
 		return 0;
