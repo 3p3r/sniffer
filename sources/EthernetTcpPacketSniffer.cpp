@@ -9,6 +9,7 @@
 
 #include "EthernetTcpPacketSniffer.h"
 
+#include <pcap.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -210,7 +211,6 @@ void EthernetTcpPacketSniffer::onPacket(const pcap_pkthdr* header, const u_char*
 		return;
 	}
 
-	/* define/compute tcp header offset */
 	tcp = (struct sniff_tcp*)(packet + SIZE_ETHERNET + size_ip);
 	size_tcp = TH_OFF(tcp)*4;
 
@@ -219,17 +219,10 @@ void EthernetTcpPacketSniffer::onPacket(const pcap_pkthdr* header, const u_char*
 		return;
 	}
 
-	/* define/compute tcp payload (segment) offset */
 	auto payload = (packet + SIZE_ETHERNET + size_ip + size_tcp);
+	size_payload = header->caplen - (SIZE_ETHERNET + size_ip + size_tcp);
 
-	/* compute tcp payload (segment) size */
-	size_payload = ::ntohs(ip->ip_len) - (size_ip + size_tcp);
-
-	/*
-	 * Print payload data; it might be binary, so don't just
-	 * treat it as a string.
-	 */
-	if (size_payload > 0) {
+	if (size_payload > 0 && payload[0] != '\0') {
 		onTcpPayload(payload, size_payload);
 	}
 }
